@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 
 def solve_sudoku(board):
     # Placeholder for your Sudoku solving algorithm
@@ -11,70 +12,27 @@ def main():
 
     st.write("Enter the Sudoku puzzle below. Use 0 for empty cells.")
     
-    # Custom CSS to style the input grid
-    st.markdown("""
-        <style>
-        .input-container {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 2px;
-            width: 180px;
-            margin: 0 auto;
-        }
-        .input-container div {
-            position: relative;
-            width: 20px;
-            height: 20px;
-        }
-        .input-container div:before {
-            content: '';
-            display: block;
-            padding-top: 100%;
-        }
-        .input-container input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-            text-align: center;
-            border: 1px solid #ccc;
-        }
-        .input-container div:nth-child(3n+1) {
-            border-left: 2px solid black;
-        }
-        .input-container div:nth-child(-n+3),
-        .input-container div:nth-child(n+7):nth-child(-n+9) {
-            border-top: 2px solid black;
-        }
-        .input-container div:nth-child(9n+1) {
-            border-left: 2px solid black;
-        }
-        .input-container div:nth-child(9n-7) {
-            border-right: 2px solid black;
-        }
-        .input-container div:nth-child(n+55) {
-            border-bottom: 2px solid black;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-    # Create a 9x9 grid for user input
+    # Create a 9x9 DataFrame for user input
     board = np.zeros((9, 9), dtype=int)
+    input_data = {f'Col {j+1}': [0]*9 for j in range(9)}
+    df = pd.DataFrame(input_data)
+
     with st.form(key='sudoku_form'):
-        input_container = st.empty()
-        input_container.markdown('<div class="input-container">', unsafe_allow_html=True)
+        st.write("Enter your Sudoku puzzle below:")
         for i in range(9):
+            cols = st.columns(9)
             for j in range(9):
-                board[i, j] = st.number_input("", min_value=0, max_value=9, step=1, key=f"{i}-{j}", format='%d')
-        input_container.markdown('</div>', unsafe_allow_html=True)
+                df.iloc[i, j] = cols[j].number_input("", min_value=0, max_value=9, step=1, key=f"{i}-{j}")
+
         submitted = st.form_submit_button("Solve")
 
     if submitted:
+        for i in range(9):
+            for j in range(9):
+                board[i, j] = df.iloc[i, j]
         solved_board = solve_sudoku(board)
         st.write("Solved Sudoku Board:")
-        st.write(solved_board)
+        st.write(pd.DataFrame(solved_board))
 
 if __name__ == "__main__":
     main()
