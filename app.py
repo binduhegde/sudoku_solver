@@ -26,6 +26,7 @@ def display_sudoku(board):
             width: 30px;
             height: 30px;
             font-size: 18px;
+            box-sizing: border-box;
         }
         .sudoku-cell:nth-child(3n+1) {
             border-left-width: 2px;
